@@ -1,0 +1,122 @@
+.title {
+  padding: 50px 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.modal {
+  width: 80%;
+  max-width: 800px;
+  min-height: 270px;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.closeIcon {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.input {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 15px;
+}
+
+.input input:disabled,
+input:disabled + label {
+  color: #ccc;
+  cursor: default;
+}
+
+.text {
+  text-align: center;
+  transform: rotate(90deg);
+  margin-bottom: 15px;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.message input {
+  width: 90%;
+  border: 1px solid gray;
+  padding: 5px;
+}
+
+.buttonArea {
+  display: flex;
+  gap: 15px;
+  font-size: 1.25rem;
+}
+
+.decisionButton {
+  background-color: #1565c0 !important;
+  color: white !important;
+}
+
+.cancelButton {
+  background-color: #00000094 !important;
+  color: white !important;
+}
+
+.flex {
+  display: flex;
+  gap: 15px;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.comment {
+  word-wrap: break-word;
+  display: block;
+  border: 1px solid gray;
+  padding: 5px;
+  flex: 1;
+  max-width: 85%;
+  max-width: flex 1;
+}
+
+.userComment {
+  display: flex;
+  flex-direction: column;
+}
+.userComment span {
+  display: block;
+}
+
+.button {
+  background-color: #2c3e50 !important;
+  border-color: #2c3e50 !important;
+  color: #fff !important;
+}

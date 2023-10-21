@@ -1,0 +1,20 @@
+.many {
+  background-color: gray;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 0.9rem;
+}
+.many:hover {
+  transition: 0.2s;
+  background-color: #696969;
+}
+
+.many:hover {
+  transition: 0.2s;
+  background-color: #696969;
+}

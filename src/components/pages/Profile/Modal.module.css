@@ -1,0 +1,77 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.modal {
+  width: 80%;
+  height: 50%;
+  max-width: 800px;
+  max-height: 300px;
+  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.closeIcon {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.title {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.center {
+  text-align: center;
+}
+
+.inputArea {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.inputArea label {
+  margin-bottom: 5px;
+}
+
+.input {
+  border: 1px solid gray;
+  padding: 5px;
+}
+
+.text {
+  margin-bottom: 15px;
+}
+
+.buttonArea {
+  display: flex;
+  gap: 15px;
+  font-size: 1.25rem;
+}
+
+.decisionButton {
+  background-color: #4967b5 !important;
+  color: white !important;
+}
+
+.cancelButton {
+  background-color: #00000094 !important;
+  color: white !important;
+}
