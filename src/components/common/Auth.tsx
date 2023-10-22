@@ -10,7 +10,7 @@ import {
   updateProfile,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import EmailIcon from "@material-ui/icons/Email";
+import EmailIcon from "@mui/icons-material/Email";
 import SendIcon from "@mui/icons-material/Send";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -22,68 +22,69 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
-import {Modal, makeStyles} from "@material-ui/core";
+import Modal from "@mui/material/Modal";
+// import makeStyles from "@mui/material/makeStyles";
 import {IconButton} from "@mui/material";
 import CameraIcon from "@mui/icons-material/Camera";
 import {db} from "../../firebase";
 import {arrayUnion, doc, setDoc, updateDoc} from "firebase/firestore";
 
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
+// function getModalStyle() {
+//   const top = 50;
+//   const left = 50;
 
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`,
-  };
-}
+//   return {
+//     top: `${top}%`,
+//     left: `${left}%`,
+//     transform: `translate(-${top}%, -${left}%)`,
+//   };
+// }
 
 const theme = createTheme();
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: "100vh",
-  },
-  image: {
-    backgroundImage:
-      "url(https://images.unsplash.com/photo-1589793907316-f94025b46850?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=932&q=80)",
-    backgroundRepeat: "no-repeat",
-    backgroundColor:
-      theme.palette.type === "light" ? theme.palette.grey[50] : theme.palette.grey[900],
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  modal: {
-    outline: "none",
-    position: "absolute",
-    width: 400,
-    borderRadius: 10,
-    backgroundColor: "white",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(10),
-  },
-}));
+// const useStyles = makeStyles((theme: any) => ({
+//   root: {
+//     height: "100vh",
+//   },
+//   image: {
+//     backgroundImage:
+//       "url(https://images.unsplash.com/photo-1589793907316-f94025b46850?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=932&q=80)",
+//     backgroundRepeat: "no-repeat",
+//     backgroundColor:
+//       theme.palette.type === "light" ? theme.palette.grey[50] : theme.palette.grey[900],
+//     backgroundSize: "cover",
+//     backgroundPosition: "center",
+//   },
+//   paper: {
+//     margin: theme.spacing(8, 4),
+//     display: "flex",
+//     flexDirection: "column",
+//     alignItems: "center",
+//   },
+//   avatar: {
+//     margin: theme.spacing(1),
+//     backgroundColor: theme.palette.secondary.main,
+//   },
+//   form: {
+//     width: "100%", // Fix IE 11 issue.
+//     marginTop: theme.spacing(1),
+//   },
+//   submit: {
+//     margin: theme.spacing(3, 0, 2),
+//   },
+//   modal: {
+//     outline: "none",
+//     position: "absolute",
+//     width: 400,
+//     borderRadius: 10,
+//     backgroundColor: "white",
+//     boxShadow: theme.shadows[5],
+//     padding: theme.spacing(10),
+//   },
+// }));
 
 const Auth = () => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -302,7 +303,7 @@ const Auth = () => {
             </Button>
 
             <Modal open={openModal} onClose={() => setOpenModal(false)}>
-              <div style={getModalStyle()} className={classes.modal}>
+              <div>
                 <div className={styles.login_modal}>
                   <TextField
                     InputLabelProps={{
