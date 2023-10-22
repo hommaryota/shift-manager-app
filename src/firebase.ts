@@ -4,13 +4,13 @@ import {getFirestore} from "firebase/firestore";
 import {getStorage} from "firebase/storage";
 
 export const firebaseApp = initializeApp({
-  apiKey: process.env.REACT_APP_FIREBASE_APIKEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTHDOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASEURL,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECTID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGEBUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGINGSENDERID,
-  appId: process.env.REACT_APP_FIREBASE_APPID,
+  apiKey: import.meta.env.VITE_FIREBASE_APIKEY, // cSpell:ignore VITE_FIREBASE_APIKEY
+  authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN, // cSpell:ignore VITE_FIREBASE_AUTHDOMAIN
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASEURL, // cSpell:ignore VITE_FIREBASE_DATABASEURL
+  projectId: import.meta.env.VITE_FIREBASE_PROJECTID, // cSpell:ignore VITE_FIREBASE_PROJECTID
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET, // cSpell:ignore VITE_FIREBASE_STORAGEBUCKET
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID, // cSpell:ignore VITE_FIREBASE_MESSAGINGSENDERID
+  appId: import.meta.env.VITE_FIREBASE_APPID,
 });
 
 export const storage = getStorage(firebaseApp);

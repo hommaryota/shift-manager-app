@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import styles from "./Profile.module.css";
 import modal from "./Modal.module.css";
-import {TextField} from "@material-ui/core";
+import TextField from "@mui/material/TextField";
 import {auth} from "../../../firebase";
 import SendIcon from "@mui/icons-material/Send";
 import {
@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import {FirebaseError} from "firebase/app";
 import CloseIcon from "@mui/icons-material/Close";
-import {Button} from "@material-ui/core";
+import Button from "@mui/material/Button";
 
 type Props = {
   text: string;
@@ -123,7 +123,6 @@ const Profile: React.FC<Props> = ({text, setLastName}) => {
         <Button
           fullWidth
           variant="contained"
-          color="default"
           onClick={() => changeProfile()}
           className={modal.decisionButton}
         >
@@ -212,7 +211,6 @@ const Modal: React.FC<ModalProps> = ({
           <Button
             fullWidth
             variant="contained"
-            color="default"
             onClick={() => changeEmail()}
             className={modal.decisionButton}
           >
@@ -221,7 +219,6 @@ const Modal: React.FC<ModalProps> = ({
           <Button
             fullWidth
             variant="contained"
-            color="default"
             onClick={() => {
               setIsModal(false);
               setPassword("");

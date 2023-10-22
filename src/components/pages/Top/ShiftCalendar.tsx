@@ -6,7 +6,7 @@ import styles from "./ShiftCalendar.module.css";
 
 import interactionPlugin from "@fullcalendar/interaction";
 import CloseIcon from "@mui/icons-material/Close";
-import {Button} from "@material-ui/core";
+import Button from "@mui/material/Button";
 import {auth} from "../../../firebase";
 
 import {
