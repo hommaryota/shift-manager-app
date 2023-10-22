@@ -9,38 +9,48 @@ import CloseIcon from "@mui/icons-material/Close";
 import {Button} from "@material-ui/core";
 import {auth} from "../../../firebase";
 
-import {collection, setDoc, doc, getDoc, updateDoc, arrayUnion, arrayRemove, query, orderBy, onSnapshot, getDocs, where} from "firebase/firestore";
+import {
+  collection,
+  setDoc,
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
 import {db} from "../../../firebase";
 
-const ShiftCalendar = ({text}) => {
+type Props = {
+  text: string;
+};
+
+const ShiftCalendar: React.FC<Props> = ({text}) => {
   const [isModal, setIsModal] = useState(false);
   const [isEditModal, setIsEditModal] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState("");
   const [lastTime, setLastTime] = useState("");
-  const [newShift, setNewShift] = useState("");
+  const [newShift, setNewShift] = useState({});
   const [shift, setShift] = useState("");
   const [shiftId, setShiftId] = useState("");
-  const [comment, setComment] = useState("");
   const [editShiftFalse, setEditShiftFalse] = useState(false);
   const [editLog, setEditLog] = useState("");
   const [confirm, setConfirm] = useState(false);
-
   const [comments, setComments] = useState("");
 
   const colRef = collection(db, "users");
-  const docRef = doc(colRef, auth.currentUser.uid);
+  const docRef = doc(colRef, auth.currentUser?.uid);
   useEffect(() => {
     (async () => {
       const docSnap = await getDoc(docRef);
       if (docSnap.data() !== undefined) {
-        return setShift(docSnap.data().events);
+        return setShift(docSnap.data()?.events);
       }
     })();
   }, [newShift]);
 
   // カレンダーをクリックした際の処理
-  function handleDateClick(log) {
+  function handleDateClick(log: any) {
     setIsModal(true);
     if ("dayGridMonth" === log.view.type) {
       const date = new Date();
@@ -57,36 +67,47 @@ const ShiftCalendar = ({text}) => {
 
   // モーダルからシフトの入力確定を押した際の処理
   const createShift = async () => {
-    setNewShift("");
+    setNewShift({});
     const newDate = new Date().getTime().toString();
 
     await updateDoc(docRef, {
       events: arrayUnion({
-        resourceId: auth.currentUser.uid,
+        resourceId: auth.currentUser?.uid,
         id: newDate,
-        title: `${auth.currentUser.displayName}さん`,
+        title: `${auth.currentUser?.displayName}さん`,
         start: startTime,
         end: lastTime,
         description: title,
       }),
     });
 
-    await setDoc(doc(collection(db, "users", auth.currentUser.uid, "comments"), newDate), {
-      comment: [
-        {
-          username: auth.currentUser.displayName,
-          text: title ? title : "作成",
-          timestamp: newDate,
-          start: startTime,
-          end: lastTime,
-          oldStart: startTime,
-          oldEnd: lastTime,
-        },
-      ],
-    });
+    await setDoc(
+      doc(collection(db, "users", String(auth.currentUser?.uid), "comments"), newDate),
+      {
+        comment: [
+          {
+            username: auth.currentUser?.displayName,
+            text: title ? title : "作成",
+            timestamp: newDate,
+            start: startTime,
+            end: lastTime,
+            oldStart: startTime,
+            oldEnd: lastTime,
+          },
+        ],
+      }
+    );
 
     setNewShift({
-      comment: [{title: title, start: startTime, end: lastTime, newStart: startTime, newEnd: lastTime}],
+      comment: [
+        {
+          title: title,
+          start: startTime,
+          end: lastTime,
+          newStart: startTime,
+          newEnd: lastTime,
+        },
+      ],
     });
     setIsModal(false);
     setTitle("");
@@ -95,22 +116,23 @@ const ShiftCalendar = ({text}) => {
   };
 
   // 作成したシフトをクリックした際の処理
-  async function handleEditDateClick(log) {
+  async function handleEditDateClick(log: any) {
     const docSnap = await getDoc(docRef);
-    const editShift = docSnap.data().events.filter((edit) => edit.id.toString() === log.event._def.publicId);
+    const editShift = docSnap
+      .data()
+      ?.events.filter((edit: any) => edit.id.toString() === log.event._def.publicId);
     setEditLog(editShift);
-
-    if (editShift[0].description !== "") {
-      setComment([editShift[0].description, editShift[0].title]);
-    }
     setStartTime(editShift[0].start);
     setLastTime(editShift[0].end);
     setShiftId(log.event._def.publicId);
 
-    const q = doc(collection(db, "users", auth.currentUser.uid, "comments"), log.event._def.publicId);
+    const q = doc(
+      collection(db, "users", String(auth.currentUser?.uid), "comments"),
+      log.event._def.publicId
+    );
     const aaa = await getDoc(q);
     if (aaa.data() !== undefined) {
-      setComments(aaa.data().comment);
+      setComments(aaa.data()?.comment);
     }
     if (log.event._def.extendedProps.edit === true) {
       setEditShiftFalse(true);
@@ -122,7 +144,7 @@ const ShiftCalendar = ({text}) => {
   const editShift = async () => {
     setNewShift("");
     const docSnap = await getDoc(docRef);
-    const editShift = docSnap.data().events.filter((edit) => edit.id === shiftId);
+    const editShift = docSnap.data()?.events.filter((edit: any) => edit.id === shiftId);
 
     // 現在のシフトを削除する関数
     updateDoc(docRef, {
@@ -136,7 +158,7 @@ const ShiftCalendar = ({text}) => {
           edit: true,
           color: "gray",
           resourceId: editShift[0].resourceId,
-          title: `${auth.currentUser.displayName}さん`,
+          title: `${auth.currentUser?.displayName}さん`,
           oldStart: editShift[0].start,
           oldEnd: editShift[0].end,
           start: startTime,
@@ -149,7 +171,7 @@ const ShiftCalendar = ({text}) => {
         events: arrayUnion({
           id: editShift[0].id,
           resourceId: editShift[0].resourceId,
-          title: `${auth.currentUser.displayName}さん`,
+          title: `${auth.currentUser?.displayName}さん`,
           oldStart: editShift[0].start,
           oldEnd: editShift[0].end,
           start: startTime,
@@ -161,27 +183,33 @@ const ShiftCalendar = ({text}) => {
 
     // コメント更新用関数
     if (editShift[0].startTime !== startTime || editShift[0].lastTime !== lastTime) {
-      await updateDoc(doc(collection(db, "users", auth.currentUser.uid, "comments"), shiftId), {
-        comment: arrayUnion({
-          text: title,
-          timestamp: new Date().getTime().toString(),
-          username: auth.currentUser.displayName,
-          oldStart: editShift[0].start,
-          oldEnd: editShift[0].end,
-          start: startTime,
-          end: lastTime,
-        }),
-      });
+      await updateDoc(
+        doc(collection(db, "users", String(auth.currentUser?.uid), "comments"), shiftId),
+        {
+          comment: arrayUnion({
+            text: title,
+            timestamp: new Date().getTime().toString(),
+            username: auth.currentUser?.displayName,
+            oldStart: editShift[0].start,
+            oldEnd: editShift[0].end,
+            start: startTime,
+            end: lastTime,
+          }),
+        }
+      );
     } else {
-      await updateDoc(doc(collection(db, "users", auth.currentUser.uid, "comments"), shiftId), {
-        comment: arrayUnion({
-          text: title,
-          timestamp: new Date().getTime().toString(),
-          username: auth.currentUser.displayName,
-          start: startTime,
-          end: lastTime,
-        }),
-      });
+      await updateDoc(
+        doc(collection(db, "users", String(auth.currentUser?.uid), "comments"), shiftId),
+        {
+          comment: arrayUnion({
+            text: title,
+            timestamp: new Date().getTime().toString(),
+            username: auth.currentUser?.displayName,
+            start: startTime,
+            end: lastTime,
+          }),
+        }
+      );
     }
 
     setNewShift({
@@ -198,11 +226,13 @@ const ShiftCalendar = ({text}) => {
   const test = async () => {
     if (confirm) {
       const docSnap = await getDoc(docRef);
-      setShift(docSnap.data().events);
+      setShift(docSnap.data()?.events);
     }
     if (!confirm) {
       const docSnap = await getDoc(docRef);
-      const editShift = docSnap.data().events.filter((event) => event.edit === true);
+      const editShift = docSnap
+        .data()
+        ?.events.filter((event: any) => event.edit === true);
       setShift(editShift);
     }
     setConfirm((prevState) => !prevState);
@@ -212,8 +242,6 @@ const ShiftCalendar = ({text}) => {
     <>
       <h2 className={styles.title}>{text}</h2>
       <FullCalendar
-        selectLongPressDelay="0"
-        eventLongPressDelay="0"
         eventBackgroundColor="#8db1fad9"
         editable={false}
         locale="ja"
@@ -222,7 +250,6 @@ const ShiftCalendar = ({text}) => {
         initialView="timeGridWeek"
         select={(e) => handleDateClick(e)}
         eventClick={(e) => handleEditDateClick(e)}
-        aspectRatio="1"
         navLinks={false}
         headerToolbar={{
           start: "prev today", // will normally be on the left. if RTL, will be on the right
@@ -230,10 +257,15 @@ const ShiftCalendar = ({text}) => {
           end: "dayGridMonth,timeGridWeek,timeGridDay next", // will normally be on the right. if RTL, will be on the left
         }}
         events={shift}
-        className={styles.fullCalendar}
+        // className={styles.fullCalendar}
       />
 
-      <Button fullWidth variant="contained" className={styles.button} onClick={() => test()}>
+      <Button
+        fullWidth
+        variant="contained"
+        className={styles.button}
+        onClick={() => test()}
+      >
         確定したシフトのみ表示
         {confirm ? "確定したシフトのみ表示" : "提出したシフトを表示"}
       </Button>
@@ -259,8 +291,6 @@ const ShiftCalendar = ({text}) => {
           setLastTime={setLastTime}
           title={title}
           setTitle={setTitle}
-          comment={comment}
-          setComment={setComment}
           editShiftFalse={editShiftFalse}
           setEditShiftFalse={setEditShiftFalse}
           comments={comments}
@@ -273,7 +303,27 @@ const ShiftCalendar = ({text}) => {
   );
 };
 
-const Modal = ({setIsModal, startTime, setStartTime, lastTime, setLastTime, title, setTitle, createShift}) => {
+type ModalProps = {
+  setIsModal: any;
+  startTime: any;
+  setStartTime: any;
+  lastTime: any;
+  setLastTime: any;
+  title: any;
+  setTitle: any;
+  createShift: any;
+};
+
+const Modal: React.FC<ModalProps> = ({
+  setIsModal,
+  startTime,
+  setStartTime,
+  lastTime,
+  setLastTime,
+  title,
+  setTitle,
+  createShift,
+}) => {
   return (
     <>
       <div className={styles.overlay} onClick={() => setIsModal(false)}></div>
@@ -282,12 +332,24 @@ const Modal = ({setIsModal, startTime, setStartTime, lastTime, setLastTime, titl
         <h2 className={styles.modalTitle}>シフトタイム</h2>
         <div className={styles.input}>
           <label htmlFor="startTime">開始時間</label>
-          <input type="datetime-local" id="startTime" name="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          <input
+            type="datetime-local"
+            id="startTime"
+            name="startTime"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
         </div>
         <p className={styles.text}>~</p>
         <div className={styles.input}>
           <label htmlFor="lastTime">終了時間</label>
-          <input type="datetime-local" id="lastTime" name="lastTime" value={lastTime} onChange={(e) => setLastTime(e.target.value)} />
+          <input
+            type="datetime-local"
+            id="lastTime"
+            name="lastTime"
+            value={lastTime}
+            onChange={(e) => setLastTime(e.target.value)}
+          />
         </div>
         <div className={styles.message}>
           <p>備考</p>
@@ -325,7 +387,23 @@ const Modal = ({setIsModal, startTime, setStartTime, lastTime, setLastTime, titl
   );
 };
 
-const EditModal = ({
+type EditModalProps = {
+  setIsEditModal: any;
+  startTime: any;
+  setStartTime: any;
+  lastTime: any;
+  setLastTime: any;
+  title: any;
+  setTitle: any;
+  editShift: any;
+  editShiftFalse: any;
+  setEditShiftFalse: any;
+  comments: any;
+  setComments: any;
+  editLog: any;
+};
+
+const EditModal: React.FC<EditModalProps> = ({
   setIsEditModal,
   startTime,
   setStartTime,
@@ -334,7 +412,6 @@ const EditModal = ({
   title,
   setTitle,
   editShift,
-  setComment,
   editShiftFalse,
   setEditShiftFalse,
   comments,
@@ -358,7 +435,6 @@ const EditModal = ({
           setTitle("");
           setStartTime("");
           setLastTime("");
-          setComment("");
           setEditShiftFalse(false);
           setComments("");
         }}
@@ -370,7 +446,6 @@ const EditModal = ({
             setTitle("");
             setStartTime("");
             setLastTime("");
-            setComment("");
             setEditShiftFalse(false);
             setComments("");
           }}
@@ -390,7 +465,14 @@ const EditModal = ({
         </div>
         <p className={styles.text}>~</p>
         <div className={styles.input}>
-          <input type="datetime-local" id="lastTime" name="lastTime" value={lastTime} onChange={(e) => setLastTime(e.target.value)} disabled={editShiftFalse} />
+          <input
+            type="datetime-local"
+            id="lastTime"
+            name="lastTime"
+            value={lastTime}
+            onChange={(e) => setLastTime(e.target.value)}
+            disabled={editShiftFalse}
+          />
           <label htmlFor="lastTime">終了時間</label>
         </div>
         <div className={styles.message}>
@@ -398,13 +480,15 @@ const EditModal = ({
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
         {comments &&
-          comments.map((commentList) => (
+          comments.map((commentList: any) => (
             <div key={commentList.timestamp} className={styles.flex}>
               <p className={styles.userComment}>
                 <span>{commentList.username}</span>
                 <span>{new Date(Number(commentList.timestamp)).toLocaleString()}</span>
               </p>
-              {commentList.text !== "" && <span className={styles.comment}>{commentList.text}</span>}
+              {commentList.text !== "" && (
+                <span className={styles.comment}>{commentList.text}</span>
+              )}
               {commentList.oldStart !== commentList.start && (
                 <span className={styles.comment}>
                   <p>
@@ -444,7 +528,6 @@ const EditModal = ({
               setTitle("");
               setStartTime("");
               setLastTime("");
-              setComment("");
               setEditShiftFalse(false);
             }}
             className={styles.cancelButton}

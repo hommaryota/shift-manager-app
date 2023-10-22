@@ -17,7 +17,7 @@ const Layout = () => {
 
   // ログインしてるユーザーの苗字を取得する処理
   const currentLastName = useMemo(() => {
-    const authCurrentUserName = auth.currentUser.displayName;
+    const authCurrentUserName = auth.currentUser?.displayName;
     const currentLastName = authCurrentUserName?.split(" ")[0];
     return currentLastName;
   }, [lastName]);
@@ -26,7 +26,7 @@ const Layout = () => {
   useEffect(() => {
     (async () => {
       const adminColRef = await collection(db, "admin");
-      const adminDocRef = await doc(adminColRef, auth.currentUser.uid);
+      const adminDocRef = await doc(adminColRef, auth.currentUser?.uid);
       const adminDocSnap = await getDoc(adminDocRef);
 
       if (!adminDocSnap.data()) {
@@ -36,7 +36,7 @@ const Layout = () => {
 
       const docUserRef = doc(adminColRef, "users");
       const docUserSnap = await getDoc(docUserRef);
-      setUsers(docUserSnap.data().user);
+      setUsers(docUserSnap.data()?.user);
     })();
   }, []);
 
@@ -46,9 +46,17 @@ const Layout = () => {
       <div className={styles.container}>
         <Routes>
           <Route path="/" element={<ShiftCalendar text="シフト提出画面" />} />
-          <Route path="/profile" element={<Profile text="プロフィール設定画面" setLastName={setLastName} />} />
+          <Route
+            path="/profile"
+            element={<Profile text="プロフィール設定画面" setLastName={setLastName} />}
+          />
           <Route path="/setting" element={<Setting text="通知設定画面" />} />
-          {admin && <Route path="/shift" element={<ShiftManager text="シフト管理画面" admin={admin} users={users} />} />}
+          {admin && (
+            <Route
+              path="/shift"
+              element={<ShiftManager text="シフト管理画面" users={users} />}
+            />
+          )}
         </Routes>
       </div>
     </>

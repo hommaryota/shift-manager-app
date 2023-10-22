@@ -3,7 +3,13 @@ import styles from "./Auth.module.css";
 import {useDispatch} from "react-redux";
 import {updateUserProfile} from "../../features/userSlice";
 import {auth, provider} from "../../firebase";
-import {signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail} from "firebase/auth";
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import EmailIcon from "@material-ui/icons/Email";
 import SendIcon from "@mui/icons-material/Send";
 import Avatar from "@mui/material/Avatar";
@@ -43,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundImage:
       "url(https://images.unsplash.com/photo-1589793907316-f94025b46850?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=932&q=80)",
     backgroundRepeat: "no-repeat",
-    backgroundColor: theme.palette.type === "light" ? theme.palette.grey[50] : theme.palette.grey[900],
+    backgroundColor:
+      theme.palette.type === "light" ? theme.palette.grey[50] : theme.palette.grey[900],
     backgroundSize: "cover",
     backgroundPosition: "center",
   },
@@ -88,7 +95,7 @@ const Auth = () => {
 
   const [isLogin, setIsLogin] = useState(true);
 
-  const sendResetEmail = async (e) => {
+  const sendResetEmail = async (e: any) => {
     await sendPasswordResetEmail(auth, resetEmail)
       .then(() => {
         setOpenModal(false);
@@ -121,7 +128,7 @@ const Auth = () => {
     if (authUser.user) {
       await updateProfile(authUser.user, {
         displayName: `${lastName} ${firstName}`,
-        phoneNumber: telNumber,
+        // phoneNumber: telNumber,
       });
     }
 
@@ -133,7 +140,7 @@ const Auth = () => {
     );
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: any) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
@@ -236,7 +243,11 @@ const Auth = () => {
             />
 
             <Button
-              disabled={isLogin ? !email || password.length < 6 : !lastName || !firstName || !email || password.length < 6}
+              disabled={
+                isLogin
+                  ? !email || password.length < 6
+                  : !lastName || !firstName || !email || password.length < 6
+              }
               fullWidth
               variant="contained"
               sx={{mt: 3, mb: 2}}
@@ -246,14 +257,14 @@ const Auth = () => {
                   ? async () => {
                       try {
                         await signInEmail();
-                      } catch (err) {
+                      } catch (err: any) {
                         alert(err.message);
                       }
                     }
                   : async () => {
                       try {
                         await signUpEmail();
-                      } catch (err) {
+                      } catch (err: any) {
                         alert(err.message);
                       }
                     }
@@ -271,13 +282,22 @@ const Auth = () => {
                 )}
               </Grid>
               <Grid item>
-                <span className={styles.login_toggleMode} onClick={() => setIsLogin(!isLogin)}>
+                <span
+                  className={styles.login_toggleMode}
+                  onClick={() => setIsLogin(!isLogin)}
+                >
                   {isLogin ? "Create new account" : "Back to login"}
                 </span>
               </Grid>
             </Grid>
 
-            <Button onClick={signInGoogle} fullWidth variant="contained" sx={{mt: 3, mb: 2}} startIcon={<CameraIcon />}>
+            <Button
+              onClick={signInGoogle}
+              fullWidth
+              variant="contained"
+              sx={{mt: 3, mb: 2}}
+              startIcon={<CameraIcon />}
+            >
               SignIn with Google
             </Button>
 
