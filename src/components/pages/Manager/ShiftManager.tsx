@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import FullCalendar from "@fullcalendar/react"; // must go before plugins
 import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -10,71 +10,48 @@ import CloseIcon from "@mui/icons-material/Close";
 import {Button} from "@material-ui/core";
 import {auth} from "../../../firebase";
 
-import {collection, doc, getDoc, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
 import {db} from "../../../firebase";
 
-const ShiftManager = ({text, users}) => {
+type Props = {
+  text: string;
+  users: never[];
+};
+
+const ShiftManager = ({text, users}: Props) => {
   const [isEditModal, setIsEditModal] = useState(false);
   const [title, setTitle] = useState("");
   const [startTime, setStartTime] = useState("");
   const [lastTime, setLastTime] = useState("");
-  const [newShift, setNewShift] = useState("");
-  const [shift, setShift] = useState([]);
-  const [shiftId, setShiftId] = useState("");
+  const [newShift, setNewShift] = useState([]);
   const [comment, setComment] = useState("");
-
-  const [list, setList] = useState([]);
-
   const colRef = collection(db, "users");
 
-  const [adminUser, setAdminUser] = useState("");
-  // ログインしているユーザーが管理者だった場合の処理
-  useEffect(() => {
-    (async () => {
-      const adminColRef = collection(db, "admin");
-      const docUserRef = doc(adminColRef, "users");
-      const docUserSnap = await getDoc(docUserRef);
-      setAdminUser(docUserSnap.data().user);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (adminUser.length > 0) {
-      adminUser.map((user) => {
-        const docUserRef = doc(colRef, user);
-        (async () => {
-          const docUserSnap = await getDoc(docUserRef);
-          if (!docUserSnap.data().events) {
-            return;
-          }
-          const userEvents = docUserSnap.data().events;
-          setList((prevState) => prevState.concat([{id: user, title: docUserSnap.data().displayName}]));
-          return setShift((prevState) => prevState.concat(userEvents));
-        })();
-      });
-    }
-  }, [adminUser]);
-
   // 入力されてるシフトをクリックした際の処理
-  async function handleEditDateClick(log) {
+  async function handleEditDateClick(log: any) {
     setIsEditModal(true);
     if (users.length > 0) {
       users.map((user) => {
-        if (log.event._def.resourceIds[0] !== user) {
-          return;
-        }
+        if (log.event._def.resourceIds[0] !== user) return;
+
         const docUserRef = doc(colRef, user);
         (async () => {
           const docUserSnap = await getDoc(docUserRef);
-          const c = docUserSnap.data().events;
-          const editShift = c.filter((edit) => edit.id === log.event._def.publicId);
-          if (editShift[0].description !== "") {
-            setComment([editShift[0].description, editShift[0].title, editShift[0].id]);
-          }
+          const c = docUserSnap.data()?.events;
+          const editShift = c.filter((edit: any) => edit.id === log.event._def.publicId);
+          // if (editShift[0].description !== "") {
+          //   setComment([editShift[0].description, editShift[0].title, editShift[0].id]);
+          // }
           setStartTime(editShift[0].start);
           setLastTime(editShift[0].end);
-          setShiftId(log.event._def.publicId);
-          setNewShift(() => editShift);
+          setNewShift(editShift);
         })();
       });
     }
@@ -83,12 +60,12 @@ const ShiftManager = ({text, users}) => {
   // 入力されてシフトの変更・確定した際の処理
   const editShift = async () => {
     if (users.length > 0) {
-      users.map((user) => {
+      users.map((user): void => {
         const docUserRef = doc(colRef, user);
         (async () => {
           const docUserSnap = await getDoc(docUserRef);
-          const c = docUserSnap.data().events;
-          const editShift = c.filter((edit) => edit.id === newShift[0].id);
+          const c = docUserSnap.data()?.events;
+          const editShift = c.filter((edit: any) => edit.id === newShift[0]);
           if (editShift.length === 0) {
             return;
           }
@@ -115,37 +92,29 @@ const ShiftManager = ({text, users}) => {
           });
 
           // コメント更新用関数
-          await updateDoc(doc(collection(db, "users", editShift[0].resourceId, "comments"), editShift[0].id), {
-            comment: arrayUnion({
-              text: title,
-              timestamp: new Date().getTime().toString(),
-              username: auth.currentUser.displayName,
-              oldStart: editShift[0].start,
-              oldEnd: editShift[0].end,
-              start: startTime,
-              end: lastTime,
-            }),
-          });
+          await updateDoc(
+            doc(
+              collection(db, "users", editShift[0].resourceId, "comments"),
+              editShift[0].id
+            ),
+            {
+              comment: arrayUnion({
+                text: title,
+                timestamp: new Date().getTime().toString(),
+                username: auth.currentUser?.displayName,
+                oldStart: editShift[0].start,
+                oldEnd: editShift[0].end,
+                start: startTime,
+                end: lastTime,
+              }),
+            }
+          );
 
-          setNewShift("");
+          setNewShift([]);
           setIsEditModal(false);
           setTitle("");
           setStartTime("");
           setLastTime("");
-          setShift((prevState) => {
-            const deleteShift = prevState.filter((prev) => prev.id !== newShift[0].id);
-            const newShiftList = deleteShift.concat([
-              {
-                resourceId: newShift[0].resourceId,
-                id: newShift[0].id,
-                title: `${docUserSnap.data().displayName}さん`,
-                start: startTime,
-                end: lastTime,
-                edit: true,
-              },
-            ]);
-            return newShiftList;
-          });
         })();
       });
     }
@@ -168,19 +137,23 @@ const ShiftManager = ({text, users}) => {
         editable={false}
         locale="ja"
         selectable={true}
-        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin, resourceTimelinePlugin]}
+        plugins={[
+          dayGridPlugin,
+          interactionPlugin,
+          timeGridPlugin,
+          resourceTimelinePlugin,
+        ]}
         initialView="resourceTimeline"
         eventClick={(e) => handleEditDateClick(e)}
-        aspectRatio="1"
         navLinks={false}
         headerToolbar={{
           start: "prev today", // will normally be on the left. if RTL, will be on the right
           center: "title",
           end: "dayGridMonth,timeGridWeek,timeGridDay next,resourceTimeline", // will normally be on the right. if RTL, will be on the left
         }}
-        events={shift}
-        className={styles.fullCalendar}
-        resources={list}
+        events={[]}
+        // className={styles.fullCalendar}
+        resources={[]}
       />
 
       {isEditModal && (
@@ -193,7 +166,6 @@ const ShiftManager = ({text, users}) => {
           setTitle={setTitle}
           editShift={editShift}
           comment={comment}
-          setShift={setShift}
           resetModal={resetModal}
         />
       )}
@@ -201,7 +173,28 @@ const ShiftManager = ({text, users}) => {
   );
 };
 
-const EditModal = ({startTime, setStartTime, lastTime, setLastTime, title, setTitle, editShift, comment, resetModal}) => {
+type EditProps = {
+  startTime: any;
+  setStartTime: any;
+  lastTime: any;
+  setLastTime: any;
+  title: any;
+  setTitle: any;
+  editShift: any;
+  comment: any;
+  resetModal: any;
+};
+const EditModal = ({
+  startTime,
+  setStartTime,
+  lastTime,
+  setLastTime,
+  title,
+  setTitle,
+  editShift,
+  comment,
+  resetModal,
+}: EditProps) => {
   return (
     <>
       <div className={styles.overlay} onClick={() => resetModal()}></div>
@@ -210,12 +203,24 @@ const EditModal = ({startTime, setStartTime, lastTime, setLastTime, title, setTi
         <h2 className={styles.modalTitle}>シフトタイム</h2>
         <div className={styles.input}>
           <label htmlFor="startTime">開始時間</label>
-          <input type="datetime-local" id="startTime" name="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          <input
+            type="datetime-local"
+            id="startTime"
+            name="startTime"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
         </div>
         <p className={styles.text}>~</p>
         <div className={styles.input}>
           <label htmlFor="lastTime">終了時間</label>
-          <input type="datetime-local" id="lastTime" name="lastTime" value={lastTime} onChange={(e) => setLastTime(e.target.value)} />
+          <input
+            type="datetime-local"
+            id="lastTime"
+            name="lastTime"
+            value={lastTime}
+            onChange={(e) => setLastTime(e.target.value)}
+          />
         </div>
         <div className={styles.message}>
           <p>備考</p>
@@ -242,7 +247,13 @@ const EditModal = ({startTime, setStartTime, lastTime, setLastTime, title, setTi
           >
             確定する
           </Button>
-          <Button fullWidth variant="contained" color="default" onClick={() => resetModal()} className={styles.cancelButton}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="default"
+            onClick={() => resetModal()}
+            className={styles.cancelButton}
+          >
             キャンセル
           </Button>
         </div>

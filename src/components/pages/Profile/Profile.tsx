@@ -1,54 +1,50 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import styles from "./Profile.module.css";
 import modal from "./Modal.module.css";
 import {TextField} from "@material-ui/core";
-import {auth, db} from "../../../firebase";
+import {auth} from "../../../firebase";
 import SendIcon from "@mui/icons-material/Send";
-import {EmailAuthProvider, reauthenticateWithCredential, updateEmail, updateProfile} from "firebase/auth";
+import {
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updateEmail,
+  updateProfile,
+} from "firebase/auth";
 import {FirebaseError} from "firebase/app";
 import CloseIcon from "@mui/icons-material/Close";
 import {Button} from "@material-ui/core";
-import {collection, doc, getDoc, updateDoc} from "firebase/firestore";
 
-const Profile = ({text, setLastName}) => {
-  useEffect(() => {
-    (async () => {
-      const colRef = collection(db, "users");
-      const docRef = doc(colRef, auth.currentUser.uid);
-      const docSnap = await getDoc(docRef);
-      setPhoneNumber(docSnap.data().telNumber);
-    })();
-  }, []);
+type Props = {
+  text: string;
+  setLastName: React.Dispatch<React.SetStateAction<string>>;
+};
 
-  const authCurrentUser = auth.currentUser;
+const Profile: React.FC<Props> = ({text, setLastName}) => {
+  const authCurrentUser = auth.currentUser!;
 
   const currentEmail = authCurrentUser?.email;
   const [email, setEmail] = useState(currentEmail);
 
   const userName = authCurrentUser?.displayName;
-  const [currentLastName, currentFirstName] = userName?.split(" ");
+  const [currentLastName, currentFirstName] = userName!.split(" ");
 
   // const [lastName, setLastName] = useState(currentLastName);
   const [name, setName] = useState(currentLastName);
   const [firstName, setFirstName] = useState(currentFirstName);
 
-  const currentPhonNumber = authCurrentUser.phoneNumber;
-  const [phoneNumber, setPhoneNumber] = useState(currentPhonNumber | "");
+  // const currentPhonNumber = authCurrentUser.phoneNumber;
+  // const [phoneNumber, setPhoneNumber] = useState<string>(currentPhonNumber | "");
 
   const [password, setPassword] = useState("");
   const [isModal, setIsModal] = useState(false);
 
   const changeProfile = () => {
-    updateDoc(doc(db, "users", auth.currentUser.uid), {
-      telNumber: phoneNumber,
-    });
     updateProfile(authCurrentUser, {
       displayName: `${name} ${firstName}`,
-      phoneNumber: phoneNumber,
     })
       .then(() => {
         alert("プロフィールを更新しました。");
-        setLastName(name);
+        // setLastName(name);
       })
       .catch((err) => {
         console.log(err.message);
@@ -74,7 +70,14 @@ const Profile = ({text, setLastName}) => {
         />
       </div>
       {isModal && (
-        <Modal setIsModal={setIsModal} password={password} setPassword={setPassword} email={email} setEmail={setEmail} authCurrentUser={authCurrentUser} />
+        <Modal
+          setIsModal={setIsModal}
+          password={password}
+          setPassword={setPassword}
+          email={email}
+          setEmail={setEmail}
+          authCurrentUser={authCurrentUser}
+        />
       )}
       <p>
         Email addressを変更する場合はこちら
@@ -116,10 +119,14 @@ const Profile = ({text, setLastName}) => {
           type="phonNumber"
           id="phonNumber"
           autoComplete="current-phonNumber"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
         />
-        <Button fullWidth variant="contained" color="default" onClick={() => changeProfile()} className={modal.decisionButton}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="default"
+          onClick={() => changeProfile()}
+          className={modal.decisionButton}
+        >
           変更を確定する
         </Button>
       </div>
@@ -127,12 +134,32 @@ const Profile = ({text, setLastName}) => {
   );
 };
 
-const Modal = ({setIsModal, password, setPassword, email, setEmail, authCurrentUser}) => {
+type ModalProps = {
+  setIsModal: any;
+  password: any;
+  setPassword: any;
+  email: any;
+  setEmail: any;
+  authCurrentUser: any;
+};
+
+const Modal: React.FC<ModalProps> = ({
+  setIsModal,
+  password,
+  setPassword,
+  email,
+  setEmail,
+  authCurrentUser,
+}) => {
   const changeEmail = async () => {
     (async () => {
       try {
-        const credential = await EmailAuthProvider.credential(authCurrentUser?.email ?? "", password);
-        authCurrentUser && (await reauthenticateWithCredential(authCurrentUser, credential));
+        const credential = await EmailAuthProvider.credential(
+          authCurrentUser?.email ?? "",
+          password
+        );
+        authCurrentUser &&
+          (await reauthenticateWithCredential(authCurrentUser, credential));
         //メールアドレス、パスワードリセットの処理
         await updateEmail(authCurrentUser, email)
           .then(() => {
@@ -160,15 +187,35 @@ const Modal = ({setIsModal, password, setPassword, email, setEmail, authCurrentU
         <h2 className={modal.title}>Emailアドレスを変更する</h2>
         <div className={modal.inputArea}>
           <label htmlFor="email">変更するEmailアドレスを入力</label>
-          <input className={modal.input} type="text" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            className={modal.input}
+            type="text"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
         <p className={modal.center}>パスワードを入力してください</p>
         <div className={modal.inputArea}>
           <label htmlFor="password">password</label>
-          <input className={modal.input} type="text" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input
+            className={modal.input}
+            type="text"
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
         <div className={modal.buttonArea}>
-          <Button fullWidth variant="contained" color="default" onClick={() => changeEmail()} className={modal.decisionButton}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="default"
+            onClick={() => changeEmail()}
+            className={modal.decisionButton}
+          >
             確定
           </Button>
           <Button
