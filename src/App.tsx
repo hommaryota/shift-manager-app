@@ -7,7 +7,7 @@ import Auth from "./components/common/Auth";
 import Layout from "./components/common/Layout";
 import {onAuthStateChanged} from "firebase/auth";
 
-const App = () => {
+const App: React.FC = () => {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
 
