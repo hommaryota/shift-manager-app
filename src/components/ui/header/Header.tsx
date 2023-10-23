@@ -5,7 +5,11 @@ import {Link} from "react-router-dom";
 import Hamburger from "./Hamburger";
 import HamburgerMany from "./HamburgerMany";
 
-const Header = ({currentLastName, admin}) => {
+type Props = {
+  admin: boolean;
+};
+
+const Header: React.FC<Props> = ({admin}) => {
   const [manyList, setManyList] = useState(false);
   return (
     <header className={styled.header}>
@@ -13,7 +17,7 @@ const Header = ({currentLastName, admin}) => {
         <Link to="/">店舗名</Link>
 
         <div>
-          <Hamburger setManyList={setManyList} currentLastName={currentLastName} manyList={manyList} />
+          <Hamburger setManyList={setManyList} manyList={manyList} />
           {manyList && <HamburgerMany setManyList={setManyList} admin={admin} />}
         </div>
       </div>

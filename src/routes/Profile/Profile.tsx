@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import styles from "./Profile.module.css";
 import modal from "./Modal.module.css";
 import TextField from "@mui/material/TextField";
-import {auth} from "../../../firebase";
+import {auth} from "../../firebase";
 import SendIcon from "@mui/icons-material/Send";
 import {
   EmailAuthProvider,
@@ -16,10 +16,9 @@ import Button from "@mui/material/Button";
 
 type Props = {
   text: string;
-  setLastName: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const Profile: React.FC<Props> = ({text, setLastName}) => {
+const Profile: React.FC<Props> = ({text}) => {
   const authCurrentUser = auth.currentUser!;
 
   const currentEmail = authCurrentUser?.email;

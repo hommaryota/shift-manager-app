@@ -7,7 +7,7 @@ import styles from "./ShiftCalendar.module.css";
 import interactionPlugin from "@fullcalendar/interaction";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
-import {auth} from "../../../firebase";
+import {auth} from "../../firebase";
 
 import {
   collection,
@@ -18,7 +18,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import {db} from "../../../firebase";
+import {db} from "../../firebase";
 
 type Props = {
   text: string;
